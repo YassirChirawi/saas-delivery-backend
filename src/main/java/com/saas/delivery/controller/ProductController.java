@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/v1/products") // Toutes les routes commenceront par ça
-@CrossOrigin(origins = "*") // Autorise Angular (localhost:4200) à appeler ce backend
 public class ProductController {
 
     private final ProductService productService;

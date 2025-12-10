@@ -1,15 +1,18 @@
 package com.saas.delivery.config;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -18,36 +21,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. D'abord, on active CORS
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // 2. On désactive CSRF (obligatoire pour les POST API)
-                .csrf(csrf -> csrf.disable())
-                // 3. On autorise tout le monde sans login
+                .csrf(csrf -> csrf.disable()) // Toujours désactiver CSRF pour API
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .anyRequest().permitAll() // Tout autoriser
                 );
 
         return http.build();
     }
 
+    // 🔥 LA SOLUTION NUCLÉAIRE : Ce filtre passe AVANT Spring Security
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        // AUTORISER TOUTES LES ORIGINES (Vercel, Localhost, etc.)
-        configuration.setAllowedOriginPatterns(List.of("*"));
-
-        // AUTORISER TOUTES LES MÉTHODES (IMPORTANT : OPTIONS est vital pour le Preflight)
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // AUTORISER TOUS LES HEADERS (Authorization, Content-Type...)
-        configuration.setAllowedHeaders(List.of("*"));
-
-        // Autoriser les credentials (cookies, auth headers)
-        configuration.setAllowCredentials(true);
-
+    public FilterRegistrationBean<CorsFilter> corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Autoriser le frontend Vercel (et localhost pour dev)
+        config.setAllowCredentials(true);
+        // Utilise addAllowedOriginPattern("*") au lieu de setAllowedOrigins pour éviter les conflits
+        config.addAllowedOriginPattern("*");
+
+        config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        source.registerCorsConfiguration("/**", config);
+
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        // C'est cette ligne qui change tout : Priorité MAXIMALE
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
     }
 }
