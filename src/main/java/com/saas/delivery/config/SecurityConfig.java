@@ -18,11 +18,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. On active la configuration CORS définie plus bas
+                // 1. D'abord, on active CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // 2. On désactive la protection CSRF (bloque les POST sinon)
+                // 2. On désactive CSRF (obligatoire pour les POST API)
                 .csrf(csrf -> csrf.disable())
-                // 3. On autorise tout le monde
+                // 3. On autorise tout le monde sans login
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 );
@@ -30,21 +30,20 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Cette méthode définit les règles CORS globales
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // AUTORISER TOUT LE MONDE (Vercel, Localhost, etc.)
+        // AUTORISER TOUTES LES ORIGINES (Vercel, Localhost, etc.)
         configuration.setAllowedOriginPatterns(List.of("*"));
 
-        // Autoriser toutes les méthodes (GET, POST, PUT, DELETE...)
+        // AUTORISER TOUTES LES MÉTHODES (IMPORTANT : OPTIONS est vital pour le Preflight)
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // Autoriser tous les headers
+        // AUTORISER TOUS LES HEADERS (Authorization, Content-Type...)
         configuration.setAllowedHeaders(List.of("*"));
 
-        // Autoriser l'envoi de cookies/auth (nécessaire pour certains navigateurs)
+        // Autoriser les credentials (cookies, auth headers)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
