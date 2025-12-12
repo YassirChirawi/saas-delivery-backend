@@ -49,4 +49,22 @@ public class ProductService {
 
         return productList;
     }
+    // Importe bien les classes Query et CollectionReference
+    public List<Product> getProductsByRestaurant(String restaurantId) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+
+        // Requête : Select * from products WHERE restaurantId = X
+        CollectionReference products = db.collection("products");
+        Query query = products.whereEqualTo("restaurantId", restaurantId);
+
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+
+        List<Product> productList = new ArrayList<>();
+        for (DocumentSnapshot doc : querySnapshot.get().getDocuments()) {
+            Product product = doc.toObject(Product.class);
+            product.setId(doc.getId());
+            productList.add(product);
+        }
+        return productList;
+    }
 }

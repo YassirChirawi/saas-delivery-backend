@@ -29,4 +29,14 @@ public class ProductController {
     public List<Product> getProducts() throws ExecutionException, InterruptedException {
         return productService.getAllProducts();
     }
+    @GetMapping("/restaurant/{restaurantId}")
+    public List<Product> getByRestaurant(@PathVariable String restaurantId) throws ExecutionException, InterruptedException {
+        // 👇 AJOUTE CES LIGNES DE DEBUG
+        System.out.println("🔍 REQUÊTE RECUE - ID demandé : " + restaurantId);
+
+        List<Product> products = productService.getProductsByRestaurant(restaurantId);
+
+        System.out.println("✅ RESULTAT - Nombre de produits trouvés : " + products.size());
+        return products;
+    }
 }
