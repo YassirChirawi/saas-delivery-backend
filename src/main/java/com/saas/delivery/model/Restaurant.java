@@ -12,6 +12,7 @@ public class Restaurant {
     private String name;
     private String ownerName;
     private String whatsappPhone;
+    private String email;
 
     // 👇 CHANGEMENT ICI : On renomme "isActive" en "active"
     private boolean active;

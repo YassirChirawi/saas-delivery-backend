@@ -38,4 +38,9 @@ public class RestaurantController {
     public Restaurant getById(@PathVariable String id) throws ExecutionException, InterruptedException {
         return service.getRestaurantById(id);
     }
+
+    @GetMapping("/owner/{email}")
+    public Restaurant getByEmail(@PathVariable String email) throws ExecutionException, InterruptedException {
+        return service.getRestaurantByEmail(email);
+    }
 }

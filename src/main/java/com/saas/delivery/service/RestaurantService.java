@@ -51,4 +51,20 @@ public class RestaurantService {
             return null;
         }
     }
+
+    public Restaurant getRestaurantByEmail(String email) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+
+        // On cherche le restaurant qui a cet email
+        Query query = db.collection("restaurants").whereEqualTo("email", email);
+        List<QueryDocumentSnapshot> docs = query.get().get().getDocuments();
+
+        if (!docs.isEmpty()) {
+            Restaurant resto = docs.get(0).toObject(Restaurant.class);
+            resto.setId(docs.get(0).getId()); // Important de remettre l'ID
+            return resto;
+        }
+        return null; // Pas trouvé
+    }
+
 }
