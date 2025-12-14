@@ -43,4 +43,9 @@ public class RestaurantController {
     public Restaurant getByEmail(@PathVariable String email) throws ExecutionException, InterruptedException {
         return service.getRestaurantByEmail(email);
     }
+
+    @PutMapping("/{id}")
+    public String updateRestaurant(@PathVariable String id, @RequestBody Restaurant restaurant) throws ExecutionException, InterruptedException {
+        return service.updateRestaurant(id, restaurant);
+    }
 }

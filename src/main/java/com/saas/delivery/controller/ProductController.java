@@ -39,4 +39,16 @@ public class ProductController {
         System.out.println("✅ RESULTAT - Nombre de produits trouvés : " + products.size());
         return products;
     }
+
+    @PutMapping("/{id}")
+    public String updateProduct(@PathVariable String id, @RequestBody Product product) throws ExecutionException, InterruptedException {
+        // Attention : Firebase update ne renvoie pas l'objet, juste un timestamp
+        // Assure-toi que ton ProductService a une méthode update
+        return productService.updateProduct(id, product);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteProduct(@PathVariable String id) throws ExecutionException, InterruptedException {
+        return productService.deleteProduct(id);
+    }
 }

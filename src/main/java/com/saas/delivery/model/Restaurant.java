@@ -18,4 +18,6 @@ public class Restaurant {
     private boolean active;
 
     private String imageUrl;
+    private String description;
+    private String address;
 }

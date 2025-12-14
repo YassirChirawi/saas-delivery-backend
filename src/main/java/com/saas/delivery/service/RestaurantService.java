@@ -17,11 +17,20 @@ public class RestaurantService {
 
     public String createRestaurant(Restaurant restaurant) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
-        // On force l'ID pour qu'il soit joli dans l'URL (slug)
-        // ex: "Chez Mario" -> "chez-mario" (A faire côté front ou ici)
-        DocumentReference docRef = db.collection(COLLECTION).document(restaurant.getId());
-        docRef.set(restaurant);
-        return restaurant.getId();
+
+        // 👇 C'EST ICI LA CORRECTION
+        // Au lieu de faire .document(restaurant.getId()) qui plante car getId() est null...
+
+        // 1. On crée une référence vide pour générer un ID unique automatiquement
+        DocumentReference docRef = db.collection("restaurants").document();
+
+        // 2. On récupère cet ID généré et on le met dans l'objet Java
+        restaurant.setId(docRef.getId());
+
+        // 3. On sauvegarde l'objet complet (qui contient maintenant son ID)
+        ApiFuture<WriteResult> result = docRef.set(restaurant);
+
+        return result.get().getUpdateTime().toString();
     }
 
     public List<Restaurant> getAllRestaurants() throws ExecutionException, InterruptedException {
@@ -67,4 +76,18 @@ public class RestaurantService {
         return null; // Pas trouvé
     }
 
+    public String updateRestaurant(String id, Restaurant restaurant) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+
+        // Sécurité : On force l'ID dans l'objet pour être sûr qu'il est enregistré correctement
+        restaurant.setId(id);
+
+        // .set() va écraser les anciennes données par les nouvelles
+        ApiFuture<WriteResult> writeResult = db.collection("restaurants").document(id).set(restaurant);
+
+        return writeResult.get().getUpdateTime().toString();
+    }
 }
+
+
+

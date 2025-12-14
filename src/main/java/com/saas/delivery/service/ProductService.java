@@ -67,4 +67,16 @@ public class ProductService {
         }
         return productList;
     }
+
+    public String updateProduct(String id, Product product) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        ApiFuture<WriteResult> writeResult = db.collection("products").document(id).set(product);
+        return writeResult.get().getUpdateTime().toString();
+    }
+
+    public String deleteProduct(String id) {
+        Firestore db = FirestoreClient.getFirestore();
+        db.collection("products").document(id).delete();
+        return "Product deleted " + id;
+    }
 }
