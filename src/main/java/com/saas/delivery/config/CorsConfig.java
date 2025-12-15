@@ -11,23 +11,17 @@ import java.util.Collections;
 
 @Configuration
 public class CorsConfig {
-
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        // 1. Autoriser les Cookies / Authentification
         config.setAllowCredentials(true);
-
-        // 2. Autoriser Vercel (et localhost pour tes tests)
-        // Utilise setAllowedOriginPatterns au lieu de setAllowedOrigins
+        // Remplace par l'URL exacte de ton Vercel (sans le slash à la fin)
         config.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:4200",
-                "https://*.vercel.app" // La joker card magique
+                "https://saas-delivery-frontend-*.vercel.app", // Le * gère les previews Vercel
+                "https://saas-delivery-frontend.vercel.app/" // Ton URL principale
         ));
-
-        // 3. Tout autoriser pour les Headers et Méthodes
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
