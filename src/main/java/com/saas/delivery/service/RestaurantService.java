@@ -14,12 +14,57 @@ import java.util.concurrent.ExecutionException;
 public class RestaurantService {
 
     private static final String COLLECTION = "restaurants";
+    private static final String REVIEWS_COLLECTION = "reviews";
+
+    public String addReview(String restaurantId, com.saas.delivery.model.Review review)
+            throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+
+        // 1. Check if order has already been reviewed
+        Query query = db.collection(REVIEWS_COLLECTION).whereEqualTo("orderId", review.getOrderId());
+        if (!query.get().get().isEmpty()) {
+            throw new IllegalArgumentException("This order has already been reviewed.");
+        }
+
+        DocumentReference restaurantRef = db.collection(COLLECTION).document(restaurantId);
+        DocumentReference reviewRef = db.collection(REVIEWS_COLLECTION).document(); // Auto ID
+
+        review.setId(reviewRef.getId());
+        review.setRestaurantId(restaurantId);
+        review.setCreatedAt(java.time.Instant.now().toString());
+
+        // Run transaction
+        return db.runTransaction(transaction -> {
+            DocumentSnapshot restaurantSnapshot = transaction.get(restaurantRef).get();
+            Restaurant restaurant = restaurantSnapshot.toObject(Restaurant.class);
+
+            if (restaurant == null) {
+                throw new IllegalArgumentException("Restaurant not found");
+            }
+
+            // Calculate new rating
+            double currentRating = restaurant.getRating() != null ? restaurant.getRating() : 0.0;
+            int currentCount = restaurant.getRatingCount() != null ? restaurant.getRatingCount() : 0;
+
+            double newRating = ((currentRating * currentCount) + review.getRating()) / (currentCount + 1);
+
+            // Round to 1 decimal place if needed, or keep precision.
+
+            transaction.update(restaurantRef, "rating", newRating);
+            transaction.update(restaurantRef, "ratingCount", currentCount + 1);
+
+            transaction.set(reviewRef, review);
+
+            return review.getId();
+        }).get();
+    }
 
     public String createRestaurant(Restaurant restaurant) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
 
         // 👇 C'EST ICI LA CORRECTION
-        // Au lieu de faire .document(restaurant.getId()) qui plante car getId() est null...
+        // Au lieu de faire .document(restaurant.getId()) qui plante car getId() est
+        // null...
 
         // 1. On crée une référence vide pour générer un ID unique automatiquement
         DocumentReference docRef = db.collection("restaurants").document();
@@ -79,7 +124,8 @@ public class RestaurantService {
     public String updateRestaurant(String id, Restaurant restaurant) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
 
-        // Sécurité : On force l'ID dans l'objet pour être sûr qu'il est enregistré correctement
+        // Sécurité : On force l'ID dans l'objet pour être sûr qu'il est enregistré
+        // correctement
         restaurant.setId(id);
 
         // .set() va écraser les anciennes données par les nouvelles
@@ -88,6 +134,3 @@ public class RestaurantService {
         return writeResult.get().getUpdateTime().toString();
     }
 }
-
-
-

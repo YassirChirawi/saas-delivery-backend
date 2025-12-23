@@ -17,6 +17,9 @@ public class Restaurant {
     // 👇 CHANGEMENT ICI : On renomme "isActive" en "active"
     private boolean active;
 
+    private Double rating = 0.0;
+    private Integer ratingCount = 0;
+
     private String imageUrl;
     private String description;
     private String address;

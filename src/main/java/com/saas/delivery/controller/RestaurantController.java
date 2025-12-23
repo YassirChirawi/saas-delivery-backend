@@ -23,6 +23,12 @@ public class RestaurantController {
         return service.createRestaurant(restaurant);
     }
 
+    @PostMapping("/{id}/reviews")
+    public String addReview(@PathVariable String id, @RequestBody com.saas.delivery.model.Review review)
+            throws ExecutionException, InterruptedException {
+        return service.addReview(id, review);
+    }
+
     @GetMapping
     public List<Restaurant> getAll() throws ExecutionException, InterruptedException {
         // 👇 C'était ici l'erreur, il manquait "Restaurants" à la fin
@@ -45,7 +51,8 @@ public class RestaurantController {
     }
 
     @PutMapping("/{id}")
-    public String updateRestaurant(@PathVariable String id, @RequestBody Restaurant restaurant) throws ExecutionException, InterruptedException {
+    public String updateRestaurant(@PathVariable String id, @RequestBody Restaurant restaurant)
+            throws ExecutionException, InterruptedException {
         return service.updateRestaurant(id, restaurant);
     }
 }
