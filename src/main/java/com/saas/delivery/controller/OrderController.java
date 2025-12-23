@@ -21,8 +21,9 @@ public class OrderController {
     }
 
     @org.springframework.web.bind.annotation.PatchMapping("/{id}/status")
-    public void updateStatus(@org.springframework.web.bind.annotation.PathVariable String id, @org.springframework.web.bind.annotation.RequestParam String status) {
+    public void updateStatus(@org.springframework.web.bind.annotation.PathVariable String id,
+            @org.springframework.web.bind.annotation.RequestParam String status) {
         service.updateOrderStatus(id, status);
+
     }
-}
 }
