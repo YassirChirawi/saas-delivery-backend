@@ -45,7 +45,8 @@ public class FirebaseConfig {
             // On vérifie si le fichier existe avant de planter
             ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
             if (!resource.exists()) {
-                throw new RuntimeException("❌ CRITICAL: No 'FIREBASE_CONFIG_JSON' env var AND no 'serviceAccountKey.json' file found.");
+                throw new RuntimeException(
+                        "❌ CRITICAL: No 'FIREBASE_CONFIG_JSON' env var AND no 'serviceAccountKey.json' file found.");
             }
 
             try (InputStream serviceAccount = resource.getInputStream()) {
@@ -56,5 +57,10 @@ public class FirebaseConfig {
         }
 
         return FirebaseApp.initializeApp(options);
+    }
+
+    @Bean
+    public com.google.firebase.messaging.FirebaseMessaging firebaseMessaging(FirebaseApp firebaseApp) {
+        return com.google.firebase.messaging.FirebaseMessaging.getInstance(firebaseApp);
     }
 }
