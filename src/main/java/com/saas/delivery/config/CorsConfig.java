@@ -20,7 +20,12 @@ public class CorsConfig {
         // Remplace par l'URL exacte de ton Vercel (sans le slash à la fin)
         config.setAllowedOriginPatterns(Arrays.asList(
                 "https://saas-delivery-frontend-*.vercel.app", // Le * gère les previews Vercel
-                "https://saas-delivery-frontend.vercel.app/" // Ton URL principale
+                "https://saas-delivery-frontend.vercel.app/",
+                "http://localhost:4200",
+                "http://localhost",
+                "capacitor://localhost",
+                "*" // Allows any origin for testing (Caution: Remove in strict production if
+                    // needed)
         ));
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
