@@ -23,6 +23,7 @@ public class CorsConfig {
                 "https://saas-delivery-frontend.vercel.app/",
                 "http://localhost:4200",
                 "http://localhost",
+                "https://localhost", // Fix: Allow HTTPS origin
                 "capacitor://localhost",
                 "*" // Allows any origin for testing (Caution: Remove in strict production if
                     // needed)
