@@ -28,7 +28,8 @@ public class OrderService {
         // 1.5 Gestion Code Promo
         if (order.getPromoCode() != null && !order.getPromoCode().isEmpty()) {
             try {
-                double discount = promoCodeService.calculateDiscount(order.getPromoCode(), order.getTotalPrice());
+                double discount = promoCodeService.calculateDiscount(order.getPromoCode(), order.getTotalPrice(),
+                        order.getRestaurantId());
                 order.setDiscountAmount(discount);
                 order.setFinalPrice(order.getTotalPrice() - discount);
 

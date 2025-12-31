@@ -23,4 +23,8 @@ public class Restaurant {
     private String imageUrl;
     private String description;
     private String address;
+
+    // Delivery Info
+    private String deliveryTime; // e.g. "20-30 min"
+    private Double deliveryFees; // e.g. 15.0 (DH)
 }

@@ -33,11 +33,18 @@ public class PromoCodeService {
     /**
      * Valide le code et retourne le montant de la réduction.
      */
-    public double calculateDiscount(String code, double orderTotal) throws Exception {
+    public double calculateDiscount(String code, double orderTotal, String restaurantId) throws Exception {
         PromoCode promo = getPromoCode(code);
 
         if (promo == null || !promo.isActive()) {
             throw new Exception("Code promo invalide ou inactif");
+        }
+
+        // Validate Restaurant Specificity
+        if (promo.getRestaurantId() != null && !promo.getRestaurantId().isEmpty()) {
+            if (restaurantId == null || !promo.getRestaurantId().equals(restaurantId)) {
+                throw new Exception("Ce code promo n'est pas valide pour ce restaurant");
+            }
         }
 
         if (promo.getExpiryDate() != null && promo.getExpiryDate().before(new Date())) {
@@ -74,5 +81,17 @@ public class PromoCodeService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public java.util.List<PromoCode> getPromoCodesByRestaurant(String restaurantId)
+            throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        var query = db.collection(COLLECTION_NAME).whereEqualTo("restaurantId", restaurantId).get().get();
+        return query.toObjects(PromoCode.class);
+    }
+
+    public void deletePromoCode(String code) {
+        Firestore db = FirestoreClient.getFirestore();
+        db.collection(COLLECTION_NAME).document(code).delete();
     }
 }

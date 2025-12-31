@@ -12,4 +12,5 @@ public class PromoCode {
     private int maxUsage;
     private int currentUsage;
     private boolean active;
+    private String restaurantId; // Optional: Link to a specific restaurant
 }
