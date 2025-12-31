@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Data
 public class Order {
-    private String uid;          // L'ID unique de la commande (Firestore)
+    private String uid; // L'ID unique de la commande (Firestore)
     private String restaurantId;
     private String restaurantName;
 
@@ -19,8 +19,12 @@ public class Order {
     private double totalPrice;
     private String deliveryType; // "pickup" ou "delivery"
     private String deliveryZone;
-    private String note;         // La remarque du client
+    private String note; // La remarque du client
 
-    private String status;       // "PENDING", "ACCEPTED", "READY", "DELIVERED"
-    private Date createdAt;      // Date de la commande
+    private String promoCode;
+    private double discountAmount;
+    private double finalPrice;
+
+    private String status; // "PENDING", "ACCEPTED", "READY", "DELIVERED"
+    private Date createdAt; // Date de la commande
 }

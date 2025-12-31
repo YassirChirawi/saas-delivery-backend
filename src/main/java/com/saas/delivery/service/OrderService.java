@@ -12,9 +12,11 @@ import java.util.UUID;
 public class OrderService {
 
     private final NotificationService notificationService;
+    private final PromoCodeService promoCodeService;
 
-    public OrderService(NotificationService notificationService) {
+    public OrderService(NotificationService notificationService, PromoCodeService promoCodeService) {
         this.notificationService = notificationService;
+        this.promoCodeService = promoCodeService;
     }
 
     public String createOrder(Order order) {
@@ -22,6 +24,27 @@ public class OrderService {
 
         // 1. Générer un ID unique pour la commande
         String orderId = UUID.randomUUID().toString();
+
+        // 1.5 Gestion Code Promo
+        if (order.getPromoCode() != null && !order.getPromoCode().isEmpty()) {
+            try {
+                double discount = promoCodeService.calculateDiscount(order.getPromoCode(), order.getTotalPrice());
+                order.setDiscountAmount(discount);
+                order.setFinalPrice(order.getTotalPrice() - discount);
+
+                // Incrémenter l'utilisation
+                promoCodeService.incrementUsage(order.getPromoCode());
+            } catch (Exception e) {
+                // En cas d'erreur (code invalide entre temps), on ignore le code ou on rejette
+                // Ici on choisit d'ignorer le code et de remettre le prix normal
+                order.setPromoCode(null);
+                order.setDiscountAmount(0);
+                order.setFinalPrice(order.getTotalPrice());
+                System.err.println("Promo code error: " + e.getMessage());
+            }
+        } else {
+            order.setFinalPrice(order.getTotalPrice());
+        }
 
         // 2. Remplir les champs automatiques
         order.setUid(orderId);
